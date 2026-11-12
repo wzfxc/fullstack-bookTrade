@@ -2,7 +2,7 @@ import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@
 import { Reflector } from '@nestjs/core';
 import { Role } from '@prisma/client';
 import { Request } from 'express';
-import { PublicUser } from '../../users/public-user-select';
+import { PublicUser } from '../../modules/users/public-user-select';
 import { REQUIRED_ROLES_KEY } from '../decorators/roles.decorator';
 
 @Injectable()

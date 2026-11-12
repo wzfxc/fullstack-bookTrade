@@ -1,6 +1,6 @@
 import { NotFoundException } from '@nestjs/common';
 import { Role } from '@prisma/client';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../infra/prisma/prisma.service';
 import { PublicUser } from '../users/public-user-select';
 import { UsersService } from '../users/users.service';
 import { ProfileService } from './profile.service';

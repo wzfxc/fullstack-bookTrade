@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Role } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
-import { MailService } from '../mail/mail.service';
+import { MailService } from '../../infra/mail/mail.service';
 import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
 

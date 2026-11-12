@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { Book, Prisma, Role } from '@prisma/client';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../infra/prisma/prisma.service';
 import { PublicUser } from '../users/public-user-select';
 import { CreateBookDto } from './dto/create-book.dto';
 import { FindBooksQueryDto } from './dto/find-books-query.dto';

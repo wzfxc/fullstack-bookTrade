@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Patch } from '@nestjs/common';
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { PublicUser } from '../users/public-user-select';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ProfileService, UserProfileResponse } from './profile.service';

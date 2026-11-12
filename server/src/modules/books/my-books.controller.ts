@@ -10,7 +10,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { Book } from '@prisma/client';
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { PublicUser } from '../users/public-user-select';
 import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';

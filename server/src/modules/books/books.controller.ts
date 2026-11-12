@@ -1,6 +1,6 @@
 import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common';
 import { Book } from '@prisma/client';
-import { Public } from '../auth/decorators/public.decorator';
+import { Public } from '../../common/decorators/public.decorator';
 import { BooksService, PaginatedBooks } from './books.service';
 import { FindBooksQueryDto } from './dto/find-books-query.dto';
 

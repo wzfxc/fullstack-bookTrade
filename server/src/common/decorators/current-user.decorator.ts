@@ -1,6 +1,6 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { Request } from 'express';
-import { PublicUser } from '../../users/public-user-select';
+import { PublicUser } from '../../modules/users/public-user-select';
 
 export const CurrentUser = createParamDecorator(
   (_data: unknown, context: ExecutionContext): PublicUser =>

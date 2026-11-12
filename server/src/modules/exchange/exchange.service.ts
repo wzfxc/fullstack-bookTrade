@@ -3,8 +3,8 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { MailService } from '../mail/mail.service';
-import { PrismaService } from '../prisma/prisma.service';
+import { MailService } from '../../infra/mail/mail.service';
+import { PrismaService } from '../../infra/prisma/prisma.service';
 import { PublicUser, publicUserSelect } from '../users/public-user-select';
 
 @Injectable()

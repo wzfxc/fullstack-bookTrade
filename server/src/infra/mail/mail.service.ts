@@ -2,7 +2,7 @@ import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config';
 import { Book } from '@prisma/client';
 import { createTransport, Transporter } from 'nodemailer';
-import { PublicUser } from '../users/public-user-select';
+import { PublicUser } from '../../modules/users/public-user-select';
 
 export interface ExchangeRequestEmail {
   requestedBook: Book;

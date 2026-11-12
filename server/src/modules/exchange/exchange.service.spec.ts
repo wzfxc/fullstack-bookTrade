@@ -1,7 +1,7 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Role } from '@prisma/client';
-import { MailService } from '../mail/mail.service';
-import { PrismaService } from '../prisma/prisma.service';
+import { MailService } from '../../infra/mail/mail.service';
+import { PrismaService } from '../../infra/prisma/prisma.service';
 import { PublicUser } from '../users/public-user-select';
 import { ExchangeService } from './exchange.service';
 

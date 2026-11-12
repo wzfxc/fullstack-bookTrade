@@ -1,5 +1,5 @@
 import { Controller, HttpCode, HttpStatus, Param, ParseUUIDPipe, Post } from '@nestjs/common';
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { PublicUser } from '../users/public-user-select';
 import { ExchangeService } from './exchange.service';
 
