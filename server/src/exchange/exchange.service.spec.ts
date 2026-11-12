@@ -11,21 +11,29 @@ describe('ExchangeService.requestExchange', () => {
     email: 'requester@example.com',
     name: 'Requester',
     role: Role.USER,
+    avatarUrl: null,
   };
   const owner: PublicUser = {
     id: '22222222-2222-4222-8222-222222222222',
     email: 'owner@example.com',
     name: 'Owner',
     role: Role.USER,
+    avatarUrl: null,
   };
   const bookId = '33333333-3333-4333-8333-333333333333';
 
-  let prismaService: { book: { findUnique: jest.Mock; findMany: jest.Mock } };
+  let prismaService: {
+    book: { findUnique: jest.Mock; findMany: jest.Mock };
+    exchangeRequest: { create: jest.Mock };
+  };
   let mailService: { sendExchangeRequest: jest.Mock };
   let exchangeService: ExchangeService;
 
   beforeEach(() => {
-    prismaService = { book: { findUnique: jest.fn(), findMany: jest.fn() } };
+    prismaService = {
+      book: { findUnique: jest.fn(), findMany: jest.fn() },
+      exchangeRequest: { create: jest.fn() },
+    };
     mailService = { sendExchangeRequest: jest.fn() };
     exchangeService = new ExchangeService(
       prismaService as unknown as PrismaService,
@@ -39,6 +47,7 @@ describe('ExchangeService.requestExchange', () => {
     await expect(exchangeService.requestExchange(bookId, requester)).rejects.toThrow(
       new NotFoundException('Book no longer exists or was deleted'),
     );
+    expect(prismaService.exchangeRequest.create).not.toHaveBeenCalled();
     expect(mailService.sendExchangeRequest).not.toHaveBeenCalled();
   });
 
@@ -52,11 +61,18 @@ describe('ExchangeService.requestExchange', () => {
     await expect(exchangeService.requestExchange(bookId, requester)).rejects.toThrow(
       new BadRequestException('Cannot request exchange for your own book'),
     );
+    expect(prismaService.exchangeRequest.create).not.toHaveBeenCalled();
     expect(mailService.sendExchangeRequest).not.toHaveBeenCalled();
   });
 
-  it('emails the owner with the requester details and books', async () => {
-    const requestedBook = { id: bookId, userId: owner.id, name: 'Dune', author: 'Herbert', user: owner };
+  it('records the exchange request and emails the owner with the requester details and books', async () => {
+    const requestedBook = {
+      id: bookId,
+      userId: owner.id,
+      name: 'Dune',
+      author: 'Herbert',
+      user: owner,
+    };
     const requesterBooks = [{ id: 'book-1', name: 'Emma', author: 'Austen' }];
     prismaService.book.findUnique.mockResolvedValue(requestedBook);
     prismaService.book.findMany.mockResolvedValue(requesterBooks);
@@ -66,6 +82,13 @@ describe('ExchangeService.requestExchange', () => {
     expect(prismaService.book.findUnique).toHaveBeenCalledWith(
       expect.objectContaining({ where: { id: bookId } }),
     );
+    expect(prismaService.exchangeRequest.create).toHaveBeenCalledWith({
+      data: {
+        requesterId: requester.id,
+        ownerId: owner.id,
+        bookId: requestedBook.id,
+      },
+    });
     expect(mailService.sendExchangeRequest).toHaveBeenCalledWith({
       requestedBook,
       bookOwner: owner,
@@ -74,4 +97,3 @@ describe('ExchangeService.requestExchange', () => {
     });
   });
 });
-

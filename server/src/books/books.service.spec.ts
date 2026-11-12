@@ -17,6 +17,7 @@ describe('BooksService.remove', () => {
     email: 'user@example.com',
     name: 'User',
     role: Role.USER,
+    avatarUrl: null,
     ...overrides,
   });
 
@@ -59,4 +60,3 @@ describe('BooksService.remove', () => {
     await expect(booksService.remove(bookId, buildUser({}))).rejects.toThrow(NotFoundException);
   });
 });
-

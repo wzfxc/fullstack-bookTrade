@@ -5,6 +5,7 @@ export interface User {
   email: string;
   name: string;
   role: UserRole;
+  avatarUrl: string | null;
 }
 
 export interface Book {
@@ -33,3 +34,17 @@ export interface BooksQueryParams {
   search: string;
 }
 
+export interface IncomingExchangeRequest {
+  id: string;
+  requesterId: string;
+  ownerId: string;
+  bookId: string;
+  createdAt: string;
+  requester: User;
+  book: Book;
+}
+
+export interface UserProfile extends User {
+  booksCount: number;
+  incomingRequests: IncomingExchangeRequest[];
+}

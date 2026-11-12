@@ -1,4 +1,4 @@
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { IsInt, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
 
 export class FindBooksQueryDto {
@@ -14,8 +14,8 @@ export class FindBooksQueryDto {
   limit: number = 10;
 
   @IsOptional()
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   @IsString()
   @MaxLength(100)
   search?: string;
 }
-

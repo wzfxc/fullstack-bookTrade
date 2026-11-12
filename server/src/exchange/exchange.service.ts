@@ -28,6 +28,14 @@ export class ExchangeService {
       throw new BadRequestException('Cannot request exchange for your own book');
     }
 
+    await this.prismaService.exchangeRequest.create({
+      data: {
+        requesterId: requester.id,
+        ownerId: requestedBook.userId,
+        bookId: requestedBook.id,
+      },
+    });
+
     const requesterBooks = await this.prismaService.book.findMany({
       where: { userId: requester.id },
       orderBy: [{ name: 'asc' }, { id: 'asc' }],
@@ -43,4 +51,3 @@ export class ExchangeService {
     return { message: 'Exchange request sent' };
   }
 }
-

@@ -1,20 +1,26 @@
 import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Book } from '@prisma/client';
-import { createTestAccount, createTransport, getTestMessageUrl, Transporter } from 'nodemailer';
+import { createTransport, Transporter } from 'nodemailer';
 import { PublicUser } from '../users/public-user-select';
 
-interface ExchangeRequestEmail {
+export interface ExchangeRequestEmail {
   requestedBook: Book;
   bookOwner: Pick<PublicUser, 'name' | 'email'>;
   requester: Pick<PublicUser, 'name' | 'email'>;
   requesterBooks: Book[];
 }
 
+export interface PasswordResetEmail {
+  recipientEmail: string;
+  recipientName: string;
+  resetUrl: string;
+}
+
 @Injectable()
 export class MailService {
   private readonly logger = new Logger(MailService.name);
-  private transporterPromise?: Promise<Transporter>;
+  private transporter?: Transporter;
 
   constructor(private readonly configService: ConfigService) {}
 
@@ -25,23 +31,47 @@ export class MailService {
     requesterBooks,
   }: ExchangeRequestEmail): Promise<void> {
     try {
-      const transporter = await this.getTransporter();
-      const info = await transporter.sendMail({
-        from: this.configService.getOrThrow<string>('MAIL_FROM'),
+      await this.getTransporter().sendMail({
+        from: this.getSenderAddress(),
         to: bookOwner.email,
         replyTo: requester.email,
         subject: `Exchange request for "${requestedBook.name}"`,
-        text: this.buildExchangeRequestText({ requestedBook, bookOwner, requester, requesterBooks }),
+        text: this.buildExchangeRequestText({
+          requestedBook,
+          bookOwner,
+          requester,
+          requesterBooks,
+        }),
       });
-
-      const previewUrl = getTestMessageUrl(info);
-      if (previewUrl) {
-        this.logger.log(`Exchange email preview: ${previewUrl}`);
-      }
     } catch (error) {
-      this.transporterPromise = undefined;
       this.logger.error('Failed to send exchange request email', error);
       throw new ServiceUnavailableException('Unable to send the exchange request email');
+    }
+  }
+
+  async sendPasswordResetEmail({
+    recipientEmail,
+    recipientName,
+    resetUrl,
+  }: PasswordResetEmail): Promise<void> {
+    try {
+      await this.getTransporter().sendMail({
+        from: this.getSenderAddress(),
+        to: recipientEmail,
+        subject: 'Reset your BookTrade password',
+        text: [
+          `Hello ${recipientName},`,
+          '',
+          'We received a request to reset your password.',
+          `Reset your password using the link below (valid for 1 hour):`,
+          resetUrl,
+          '',
+          'If you did not request a password reset, you can safely ignore this email.',
+        ].join('\n'),
+      });
+    } catch (error) {
+      this.logger.error('Failed to send password reset email', error);
+      throw new ServiceUnavailableException('Unable to send the password reset email');
     }
   }
 
@@ -58,6 +88,9 @@ export class MailService {
     return [
       `Hello ${bookOwner.name},`,
       '',
+      `Requester Name: ${requester.name}`,
+      `Requester Email: ${requester.email}`,
+      '',
       `${requester.name} (${requester.email}) wants to exchange for your book "${requestedBook.name}" by ${requestedBook.author}.`,
       '',
       `Books offered by ${requester.name}:`,
@@ -65,33 +98,28 @@ export class MailService {
     ].join('\n');
   }
 
-  private getTransporter(): Promise<Transporter> {
-    this.transporterPromise ??= this.createTransporter();
-    return this.transporterPromise;
+  private getSenderAddress(): string {
+    return (
+      this.configService.get<string>('MAIL_FROM') ??
+      this.configService.getOrThrow<string>('SMTP_USER')
+    );
   }
 
-  private async createTransporter(): Promise<Transporter> {
-    const configuredUser = this.configService.get<string>('SMTP_USER');
-    const configuredPassword = this.configService.get<string>('SMTP_PASSWORD');
+  private getTransporter(): Transporter {
+    if (!this.transporter) {
+      const port = Number(this.configService.get<string>('SMTP_PORT', '587'));
 
-    const credentials =
-      configuredUser && configuredPassword
-        ? { user: configuredUser, pass: configuredPassword }
-        : await this.createEtherealCredentials();
+      this.transporter = createTransport({
+        host: this.configService.get<string>('SMTP_HOST', 'smtp.gmail.com'),
+        port,
+        secure: port === 465,
+        auth: {
+          user: this.configService.getOrThrow<string>('SMTP_USER'),
+          pass: this.configService.getOrThrow<string>('SMTP_PASSWORD'),
+        },
+      });
+    }
 
-    return createTransport({
-      host: this.configService.get<string>('SMTP_HOST', 'smtp.ethereal.email'),
-      port: Number(this.configService.get('SMTP_PORT', 587)),
-      secure: false,
-      auth: credentials,
-    });
-  }
-
-  private async createEtherealCredentials(): Promise<{ user: string; pass: string }> {
-    const testAccount = await createTestAccount();
-    this.logger.log(`Generated Ethereal account: ${testAccount.user}`);
-
-    return { user: testAccount.user, pass: testAccount.pass };
+    return this.transporter;
   }
 }
-

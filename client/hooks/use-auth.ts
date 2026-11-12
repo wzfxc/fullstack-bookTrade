@@ -4,7 +4,11 @@ import toast from 'react-hot-toast';
 import { getErrorMessage } from '@/lib/api-error';
 import { api } from '@/lib/api';
 import { clearAuthToken, saveAuthToken } from '@/lib/auth-token';
-import type { LoginFormValues, RegisterFormValues } from '@/lib/schemas/auth-schemas';
+import type {
+  ForgotPasswordFormValues,
+  LoginFormValues,
+  RegisterFormValues,
+} from '@/lib/schemas/auth-schemas';
 import type { User } from '@/lib/types';
 import { useAuthStore } from '@/stores/auth-store';
 
@@ -46,6 +50,33 @@ export function useRegister() {
       return authenticate({ email, password });
     },
     onSuccess: completeAuthentication,
+    onError: (error) => toast.error(getErrorMessage(error)),
+  });
+}
+
+export function useForgotPassword() {
+  return useMutation({
+    mutationFn: async (values: ForgotPasswordFormValues) => {
+      const { data } = await api.post<{ message: string }>('/auth/forgot-password', values);
+      return data;
+    },
+    onSuccess: () => toast.success('Password reset link sent to your email'),
+    onError: (error) => toast.error(getErrorMessage(error)),
+  });
+}
+
+export function useResetPassword() {
+  const router = useRouter();
+
+  return useMutation({
+    mutationFn: async (payload: { token: string; newPassword: string }) => {
+      const { data } = await api.post<{ message: string }>('/auth/reset-password', payload);
+      return data;
+    },
+    onSuccess: () => {
+      toast.success('Password reset successfully. Please log in.');
+      router.push('/login');
+    },
     onError: (error) => toast.error(getErrorMessage(error)),
   });
 }

@@ -38,18 +38,33 @@ export function LoginForm() {
           error={errors.email?.message}
           {...register('email')}
         />
-        <TextField
-          label="Password"
-          type="password"
-          autoComplete="current-password"
-          error={errors.password?.message}
-          {...register('password')}
-        />
-        <Button type="submit" className="w-full" disabled={isPending} isLoading={isPending} loadingText="Logging in...">
+        <div className="space-y-1.5">
+          <TextField
+            label="Password"
+            type="password"
+            autoComplete="current-password"
+            error={errors.password?.message}
+            {...register('password')}
+          />
+          <div className="flex justify-end">
+            <Link
+              href="/forgot-password"
+              className="text-xs font-medium text-indigo-600 hover:underline"
+            >
+              Forgot password?
+            </Link>
+          </div>
+        </div>
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={isPending}
+          isLoading={isPending}
+          loadingText="Logging in..."
+        >
           Log in
         </Button>
       </form>
     </AuthCard>
   );
 }
-

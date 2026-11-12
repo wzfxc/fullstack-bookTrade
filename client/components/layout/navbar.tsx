@@ -1,6 +1,14 @@
 'use client';
 
-import { BookOpen, LayoutDashboard, Library, LogIn, LogOut, UserPlus } from 'lucide-react';
+import {
+  BookOpen,
+  LayoutDashboard,
+  Library,
+  LogIn,
+  LogOut,
+  User as UserIcon,
+  UserPlus,
+} from 'lucide-react';
 import Link from 'next/link';
 import type { ComponentType, ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
@@ -48,6 +56,9 @@ export function Navbar() {
               <NavLink href="/me/books" icon={BookOpen}>
                 My books
               </NavLink>
+              <NavLink href="/profile" icon={UserIcon}>
+                Profile
+              </NavLink>
               {user.role === 'ADMIN' && (
                 <NavLink href="/admin" icon={LayoutDashboard}>
                   Admin
@@ -78,4 +89,3 @@ export function Navbar() {
     </header>
   );
 }
-

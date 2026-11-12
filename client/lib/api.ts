@@ -4,7 +4,12 @@ import { useAuthStore } from '@/stores/auth-store';
 import { clearAuthToken, getAuthToken } from './auth-token';
 
 const SESSION_EXPIRED_TOAST_ID = 'session-expired';
-const CREDENTIAL_ENDPOINTS = ['/auth/login', '/auth/register'];
+const CREDENTIAL_ENDPOINTS = [
+  '/auth/login',
+  '/auth/register',
+  '/auth/forgot-password',
+  '/auth/reset-password',
+];
 
 let handleSessionExpired: () => void = () => window.location.assign('/login');
 
@@ -44,4 +49,3 @@ api.interceptors.response.use(
     return Promise.reject(error);
   },
 );
-

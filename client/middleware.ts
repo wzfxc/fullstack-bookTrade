@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { AUTH_TOKEN_COOKIE_NAME } from '@/lib/auth-token';
 import { isTokenExpired } from '@/lib/jwt';
 
-const AUTH_PAGE_PATHS = ['/login', '/register'];
+const AUTH_PAGE_PATHS = ['/login', '/register', '/forgot-password', '/reset-password'];
 
 export function middleware(request: NextRequest) {
   const token = request.cookies.get(AUTH_TOKEN_COOKIE_NAME)?.value;
@@ -27,6 +27,13 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/me/:path*', '/admin/:path*', '/login', '/register'],
+  matcher: [
+    '/me/:path*',
+    '/profile/:path*',
+    '/admin/:path*',
+    '/login',
+    '/register',
+    '/forgot-password',
+    '/reset-password',
+  ],
 };
-

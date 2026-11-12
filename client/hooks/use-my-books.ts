@@ -68,6 +68,7 @@ export function useAddBook() {
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.myBooks });
       queryClient.invalidateQueries({ queryKey: queryKeys.books });
+      queryClient.invalidateQueries({ queryKey: queryKeys.profile });
     },
   });
 }
@@ -81,8 +82,8 @@ export function useDeleteMyBook() {
       toast.success('Book deleted');
       queryClient.invalidateQueries({ queryKey: queryKeys.myBooks });
       queryClient.invalidateQueries({ queryKey: queryKeys.books });
+      queryClient.invalidateQueries({ queryKey: queryKeys.profile });
     },
     onError: (error) => toast.error(getErrorMessage(error)),
   });
 }
-
