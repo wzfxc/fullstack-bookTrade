@@ -16,7 +16,8 @@ async function bootstrap(): Promise<void> {
   application.enableShutdownHooks();
 
   const configService = application.get(ConfigService);
-  await application.listen(configService.get<number>('PORT', 3000));
+  application.enableCors({ origin: configService.getOrThrow<string>('CORS_ORIGIN') });
+  await application.listen(configService.get<number>('PORT', 5000));
 }
 
 bootstrap();
