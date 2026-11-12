@@ -9,11 +9,12 @@ import {
   ParseUUIDPipe,
   Post,
 } from '@nestjs/common';
-import { Role } from '@prisma/client';
+import { Book, Role } from '@prisma/client';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { PublicUser } from '../users/public-user-select';
 import { AdminService } from './admin.service';
+import { CreateBookByAdminDto } from './dto/create-book-by-admin.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 
 @Roles(Role.ADMIN)
@@ -31,6 +32,14 @@ export class AdminController {
     return this.adminService.createUser(createUserDto);
   }
 
+  @Post('users/:userId/books')
+  createBookForUser(
+    @Param('userId', ParseUUIDPipe) userId: string,
+    @Body() createBookByAdminDto: CreateBookByAdminDto,
+  ): Promise<Book> {
+    return this.adminService.createBookForUser(userId, createBookByAdminDto);
+  }
+
   @Delete('books/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   deleteBook(
@@ -40,4 +49,3 @@ export class AdminController {
     return this.adminService.deleteBook(bookId, admin);
   }
 }
-
